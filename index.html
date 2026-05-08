@@ -1,0 +1,1056 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Архитектор Изменений</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --cream: #F5F0E8;
+  --warm-white: #FAF7F2;
+  --sage: #7A8C6E;
+  --sage-light: #A3B594;
+  --sage-dark: #4E6144;
+  --stone: #C4B9A8;
+  --stone-dark: #8C7E6E;
+  --earth: #6B5B4E;
+  --text: #2C2820;
+  --text-mid: #5C5248;
+  --text-light: #9C8E82;
+  --border: rgba(124,114,100,0.15);
+  --border-mid: rgba(124,114,100,0.25);
+}
+
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+
+body {
+  font-family: 'Jost', sans-serif;
+  background: var(--warm-white);
+  color: var(--text);
+  overflow-x: hidden;
+}
+
+/* grain */
+body::after {
+  content:'';
+  position:fixed;
+  inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  opacity:.022;
+  pointer-events:none;
+  z-index:9999;
+}
+
+/* ── NAV ── */
+nav {
+  position:fixed; top:0; left:0; right:0; z-index:500;
+  padding:22px 60px;
+  display:flex; justify-content:space-between; align-items:center;
+  background:rgba(250,247,242,0.88);
+  backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--border);
+  transition:padding .3s;
+}
+.nav-logo {
+  font-family:'Cormorant Garamond',serif;
+  font-size:17px; letter-spacing:.06em; color:var(--text);
+  text-decoration:none;
+}
+.nav-logo span{color:var(--sage);}
+.nav-right{display:flex;gap:32px;align-items:center;}
+.nav-link {
+  font-size:12px; letter-spacing:.12em; text-transform:uppercase;
+  color:var(--text-mid); text-decoration:none;
+  transition:color .3s;
+}
+.nav-link:hover{color:var(--sage-dark);}
+.nav-cta {
+  font-size:12px; letter-spacing:.12em; text-transform:uppercase;
+  color:var(--text); text-decoration:none;
+  border-bottom:1px solid var(--text); padding-bottom:2px;
+  transition:color .3s,border-color .3s;
+}
+.nav-cta:hover{color:var(--sage);border-color:var(--sage);}
+
+/* ── BUTTONS ── */
+.btn {
+  display:inline-block;
+  font-family:'Jost',sans-serif;
+  font-size:12px; font-weight:400; letter-spacing:.14em; text-transform:uppercase;
+  text-decoration:none; border:none; cursor:pointer;
+  padding:15px 38px;
+  transition:all .3s;
+}
+.btn-dark{background:var(--sage-dark);color:var(--cream);}
+.btn-dark:hover{background:var(--earth);}
+.btn-outline{background:transparent;color:var(--text);border:1px solid var(--text);}
+.btn-outline:hover{background:var(--text);color:var(--warm-white);}
+.btn-outline-light{background:transparent;color:var(--cream);border:1px solid rgba(245,240,232,.4);}
+.btn-outline-light:hover{background:rgba(245,240,232,.1);}
+.btn-cream{background:var(--cream);color:var(--sage-dark);border:1px solid var(--cream);}
+.btn-cream:hover{background:transparent;color:var(--cream);}
+.btn-full{width:100%;text-align:center;}
+.btn-note{display:block;font-size:11px;color:var(--text-light);letter-spacing:.04em;margin-top:12px;}
+.btn-note-light{color:rgba(245,240,232,.45);}
+
+/* ── LAYOUT ── */
+.container{max-width:1120px;margin:0 auto;padding:0 60px;}
+section{position:relative;}
+
+/* ── HERO ── */
+#hero {
+  min-height:100vh;
+  background:var(--cream);
+  display:flex; align-items:center;
+  padding-top:90px;
+  overflow:hidden;
+}
+.hero-orb {
+  position:absolute; right:-180px; top:50%;
+  transform:translateY(-50%);
+  width:680px; height:680px; border-radius:50%;
+  background:radial-gradient(circle,rgba(122,140,110,.14) 0%,transparent 68%);
+  pointer-events:none;
+}
+.hero-inner {
+  display:grid; grid-template-columns:1fr 1fr;
+  gap:80px; align-items:center; width:100%;
+}
+.hero-eyebrow {
+  font-size:11px; letter-spacing:.22em; text-transform:uppercase;
+  color:var(--sage); margin-bottom:26px;
+  display:flex; align-items:center; gap:12px;
+}
+.hero-eyebrow::before{content:'';width:32px;height:1px;background:var(--sage);}
+h1.hero-title {
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(50px,5vw,74px); font-weight:300; line-height:1.07;
+  margin-bottom:26px;
+}
+h1.hero-title em{font-style:italic;color:var(--sage);}
+.hero-sub {
+  font-size:16px; line-height:1.8; color:var(--text-mid);
+  font-weight:300; margin-bottom:44px; max-width:430px;
+}
+/* WHEEL */
+.wheel-wrap{position:relative;width:340px;height:340px;margin:0 auto;}
+.wheel-wrap svg{width:100%;height:100%;animation:wspin 80s linear infinite;}
+@keyframes wspin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+.wheel-center{
+  position:absolute;top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  text-align:center;
+}
+.wheel-center-text{
+  font-family:'Cormorant Garamond',serif;
+  font-size:13px;font-style:italic;color:var(--sage-dark);line-height:1.5;
+}
+
+/* ── PRODUCT SWITCHER ── */
+#switcher{
+  background:var(--warm-white);
+  padding:100px 0 0;
+}
+.switcher-intro{text-align:center;margin-bottom:56px;}
+.switcher-eyebrow{
+  font-size:11px;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--stone-dark);margin-bottom:20px;
+  display:flex;align-items:center;justify-content:center;gap:12px;
+}
+.switcher-eyebrow::before,.switcher-eyebrow::after{content:'';width:32px;height:1px;background:var(--stone-dark);}
+.switcher-title{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(34px,3.5vw,50px);font-weight:300;
+  margin-bottom:16px;
+}
+.switcher-sub{
+  font-size:15px;color:var(--text-mid);font-weight:300;
+  max-width:540px;margin:0 auto;line-height:1.75;
+}
+
+/* TABS */
+.tabs-wrap{
+  display:flex;justify-content:center;
+  border-bottom:1px solid var(--border);
+  margin-bottom:0;
+  position:sticky;top:67px;z-index:100;
+  background:rgba(250,247,242,.95);
+  backdrop-filter:blur(10px);
+}
+.tab-btn {
+  background:none;border:none;cursor:pointer;
+  font-family:'Jost',sans-serif;
+  font-size:12px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--text-light);
+  padding:20px 40px;
+  position:relative;
+  transition:color .3s;
+  white-space:nowrap;
+}
+.tab-btn::after{
+  content:'';position:absolute;bottom:-1px;left:0;right:0;
+  height:2px;background:var(--sage-dark);
+  transform:scaleX(0);transition:transform .35s ease;
+}
+.tab-btn.active{color:var(--text);}
+.tab-btn.active::after{transform:scaleX(1);}
+.tab-btn:hover{color:var(--text-mid);}
+
+/* PANELS */
+.tab-panel{display:none;}
+.tab-panel.active{display:block;}
+
+/* ── PANEL SHARED STYLES ── */
+.panel-hero{
+  padding:100px 0;
+}
+.p-eyebrow{
+  font-size:11px;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--sage);margin-bottom:20px;
+  display:flex;align-items:center;gap:12px;
+}
+.p-eyebrow::before{content:'';width:32px;height:1px;background:var(--sage);}
+.p-title{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(40px,4vw,62px);font-weight:300;line-height:1.1;
+  margin-bottom:24px;
+}
+.p-title em{font-style:italic;color:var(--sage);}
+.p-sub{
+  font-size:16px;line-height:1.8;color:var(--text-mid);
+  font-weight:300;max-width:500px;margin-bottom:44px;
+}
+.p-price-tag{
+  display:inline-block;
+  font-family:'Cormorant Garamond',serif;
+  font-size:15px;color:var(--text-mid);
+  margin-bottom:28px;
+  font-style:italic;
+}
+.p-price-tag strong{
+  font-family:'Cormorant Garamond',serif;
+  font-size:32px;font-style:normal;font-weight:400;color:var(--text);
+}
+.panel-grid{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;}
+.panel-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2px;background:var(--border);border:1px solid var(--border);}
+.panel-card{
+  background:var(--warm-white);padding:44px 40px;
+  transition:background .3s;
+}
+.panel-card:hover{background:var(--cream);}
+.panel-card-num{
+  font-family:'Cormorant Garamond',serif;
+  font-size:52px;font-weight:300;color:var(--stone);
+  line-height:1;margin-bottom:18px;
+}
+.panel-card-icon{font-size:22px;margin-bottom:16px;}
+.panel-card h3{
+  font-family:'Cormorant Garamond',serif;
+  font-size:22px;font-weight:400;margin-bottom:12px;
+}
+.panel-card p{font-size:14px;line-height:1.75;color:var(--text-mid);font-weight:300;}
+
+/* FEATURES LIST */
+.features-list{list-style:none;display:flex;flex-direction:column;}
+.feature-item{
+  display:flex;gap:24px;align-items:flex-start;
+  padding:28px 0;border-bottom:1px solid var(--border);
+  transition:padding-left .3s;cursor:default;
+}
+.feature-item:first-child{border-top:1px solid var(--border);}
+.feature-item:hover{padding-left:6px;}
+.feature-dot{
+  width:32px;height:32px;border-radius:50%;
+  background:rgba(122,140,110,.12);
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;font-size:14px;margin-top:2px;
+}
+.feature-title{
+  font-family:'Cormorant Garamond',serif;
+  font-size:20px;font-weight:400;margin-bottom:6px;
+}
+.feature-text{font-size:14px;line-height:1.7;color:var(--text-mid);font-weight:300;}
+
+/* DARK SECTION */
+.dark-section{
+  background:var(--sage-dark);
+  padding:120px 0;
+  color:var(--cream);
+  position:relative;overflow:hidden;
+}
+.dark-section::before{
+  content:'';position:absolute;
+  top:-200px;right:-200px;
+  width:500px;height:500px;border-radius:50%;
+  background:rgba(163,181,148,.08);pointer-events:none;
+}
+.dark-eyebrow{
+  font-size:11px;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--sage-light);margin-bottom:20px;
+  display:flex;align-items:center;gap:12px;
+}
+.dark-eyebrow::before{content:'';width:32px;height:1px;background:var(--sage-light);}
+.dark-title{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(36px,3.5vw,52px);font-weight:300;
+  color:var(--cream);margin-bottom:24px;line-height:1.15;
+}
+.dark-text{font-size:16px;line-height:1.85;color:rgba(245,240,232,.72);font-weight:300;}
+
+/* PRICE BOX */
+.price-box{
+  border:1px solid rgba(163,181,148,.25);
+  padding:52px 48px;
+  background:rgba(163,181,148,.07);
+}
+.price-big{
+  font-family:'Cormorant Garamond',serif;
+  font-size:68px;font-weight:300;color:var(--cream);line-height:1;margin-bottom:4px;
+}
+.price-period{font-size:13px;color:var(--sage-light);letter-spacing:.08em;margin-bottom:36px;}
+.price-list{list-style:none;margin-bottom:36px;display:flex;flex-direction:column;gap:12px;}
+.price-list li{
+  font-size:14px;color:rgba(245,240,232,.8);font-weight:300;
+  display:flex;align-items:center;gap:12px;
+}
+.price-list li::before{
+  content:'';display:block;width:4px;height:4px;
+  border-radius:50%;background:var(--sage-light);flex-shrink:0;
+}
+
+/* STEPS TIMELINE */
+.steps-timeline{display:flex;flex-direction:column;gap:0;}
+.step-row{
+  display:flex;gap:32px;align-items:flex-start;
+  padding:36px 0;border-bottom:1px solid rgba(245,240,232,.12);
+}
+.step-row:first-child{padding-top:0;}
+.step-num-big{
+  font-family:'Cormorant Garamond',serif;
+  font-size:52px;font-weight:300;color:rgba(163,181,148,.3);
+  line-height:1;flex-shrink:0;width:60px;
+}
+.step-content h3{
+  font-family:'Cormorant Garamond',serif;
+  font-size:22px;font-weight:400;color:var(--cream);margin-bottom:8px;
+}
+.step-content p{font-size:14px;line-height:1.75;color:rgba(245,240,232,.65);font-weight:300;}
+
+/* SPHERE GRID */
+.sphere-grid{display:grid;grid-template-columns:1fr 1fr;gap:2px;}
+.sphere-item{
+  background:rgba(163,181,148,.1);
+  border:1px solid rgba(163,181,148,.15);
+  padding:20px 24px;transition:background .3s;
+}
+.sphere-item:hover{background:rgba(163,181,148,.18);}
+.sphere-dot{width:5px;height:5px;border-radius:50%;background:var(--sage-light);margin-bottom:8px;}
+.sphere-name{font-size:13px;color:var(--cream);font-weight:300;letter-spacing:.04em;}
+
+/* CONTRAST TABLE */
+.contrast-table{width:100%;border-collapse:collapse;}
+.contrast-table thead tr{border-bottom:1px solid var(--border);}
+.contrast-table th{
+  font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--text-light);font-weight:400;padding:0 0 14px;text-align:left;
+}
+.contrast-table th:last-child{color:var(--sage);}
+.contrast-table td{
+  padding:18px 0;font-size:14px;font-weight:300;
+  border-bottom:1px solid var(--border);vertical-align:top;
+}
+.contrast-table td:first-child{
+  color:var(--text-light);text-decoration:line-through;
+  text-decoration-color:rgba(156,142,130,.4);padding-right:28px;width:48%;
+}
+
+/* CTA BAND */
+.cta-band{
+  background:var(--cream);
+  padding:80px 0;
+  text-align:center;
+  border-top:1px solid var(--border);
+  border-bottom:1px solid var(--border);
+}
+.cta-band-text{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(26px,3vw,38px);font-weight:300;
+  margin-bottom:32px;line-height:1.3;
+}
+.cta-band-text em{font-style:italic;color:var(--sage-dark);}
+
+/* DIVIDER */
+.divider{height:1px;background:var(--border);margin:0;}
+
+/* FAQ */
+.faq-section{background:var(--warm-white);padding:100px 0;}
+.faq-inner{display:grid;grid-template-columns:1fr 1.6fr;gap:80px;align-items:start;}
+.faq-sticky-title{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(34px,3.5vw,48px);font-weight:300;
+  position:sticky;top:120px;
+}
+.faq-eyebrow{
+  font-size:11px;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--stone-dark);margin-bottom:16px;
+  display:flex;align-items:center;gap:12px;
+}
+.faq-eyebrow::before{content:'';width:32px;height:1px;background:var(--stone-dark);}
+.faq-list{display:flex;flex-direction:column;}
+.faq-item{border-bottom:1px solid var(--border);}
+.faq-q{
+  width:100%;background:none;border:none;text-align:left;
+  padding:26px 0;
+  font-family:'Cormorant Garamond',serif;
+  font-size:21px;font-weight:400;color:var(--text);
+  cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:16px;
+  transition:color .3s;
+}
+.faq-q:hover{color:var(--sage-dark);}
+.faq-icon{width:18px;height:18px;flex-shrink:0;color:var(--sage);transition:transform .3s;}
+.faq-item.open .faq-icon{transform:rotate(45deg);}
+.faq-a{
+  font-size:14px;line-height:1.8;color:var(--text-mid);font-weight:300;
+  max-height:0;overflow:hidden;transition:max-height .4s ease,padding .3s;
+}
+.faq-item.open .faq-a{max-height:600px;padding-bottom:24px;}
+
+/* FINAL */
+#final{
+  background:var(--warm-white);
+  padding:160px 0;text-align:center;
+  position:relative;overflow:hidden;
+}
+#final::before{
+  content:'';position:absolute;top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  width:700px;height:700px;border-radius:50%;
+  background:radial-gradient(circle,rgba(122,140,110,.08) 0%,transparent 65%);
+  pointer-events:none;
+}
+.final-eyebrow{
+  font-size:11px;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--sage);margin-bottom:28px;
+  display:flex;align-items:center;justify-content:center;gap:12px;
+}
+.final-eyebrow::before,.final-eyebrow::after{content:'';width:32px;height:1px;background:var(--sage);}
+.final-title{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(42px,5vw,68px);font-weight:300;
+  max-width:660px;margin:0 auto 20px;line-height:1.1;
+}
+.final-title em{font-style:italic;color:var(--sage-dark);}
+.final-sub{
+  font-size:16px;line-height:1.8;color:var(--text-mid);
+  max-width:500px;margin:0 auto 48px;font-weight:300;
+}
+
+/* FOOTER */
+footer{
+  background:var(--text);padding:36px 60px;
+  display:flex;justify-content:space-between;align-items:center;
+}
+.footer-logo{
+  font-family:'Cormorant Garamond',serif;
+  font-size:15px;color:var(--stone);letter-spacing:.06em;
+}
+.footer-note{font-size:11px;color:var(--stone-dark);letter-spacing:.06em;}
+
+/* ANIMATIONS */
+.fade-up{opacity:0;transform:translateY(28px);transition:opacity .65s ease,transform .65s ease;}
+.fade-up.visible{opacity:1;transform:translateY(0);}
+.d1{transition-delay:.1s;}.d2{transition-delay:.2s;}.d3{transition-delay:.3s;}
+
+/* RESPONSIVE */
+@media(max-width:900px){
+  nav{padding:18px 24px;}
+  .nav-right .nav-link{display:none;}
+  .container{padding:0 24px;}
+  .hero-inner,.panel-grid,.dark-section .panel-grid,
+  .faq-inner{grid-template-columns:1fr;gap:44px;}
+  .hero-right{display:none;}
+  .panel-grid-3{grid-template-columns:1fr;}
+  .tab-btn{padding:16px 20px;font-size:11px;}
+  footer{flex-direction:column;gap:10px;text-align:center;padding:28px 24px;}
+  .faq-sticky-title{position:static;}
+  .tabs-wrap{top:60px;}
+  .sphere-grid{grid-template-columns:1fr 1fr;}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">Архитектор <span>Изменений</span></a>
+  <div class="nav-right">
+    <a href="#switcher" class="nav-link">Продукты</a>
+    <a href="#faq" class="nav-link">Вопросы</a>
+    <a href="https://t.me/Architect_Changes_bot" class="nav-cta">Начать →</a>
+  </div>
+</nav>
+
+<!-- ════ HERO ════ -->
+<section id="hero">
+  <div class="hero-orb"></div>
+  <div class="container">
+    <div class="hero-inner">
+      <div>
+        <div class="hero-eyebrow fade-up">Система осознанной жизни</div>
+        <h1 class="hero-title fade-up d1">
+          Один проект —<br><em>три инструмента</em><br>для работы над собой
+        </h1>
+        <p class="hero-sub fade-up d2">
+          Архитектор Изменений — это не курс и не коуч. Это набор конкретных инструментов: для ежедневной практики, глубокой работы над собой и профессиональной работы с людьми.
+        </p>
+        <div class="fade-up d3">
+          <a href="#switcher" class="btn btn-dark">Выбрать инструмент</a>
+          <span class="btn-note">Трекер · Маршрут · Инструменты наставника</span>
+        </div>
+      </div>
+      <div class="hero-right">
+        <div class="wheel-wrap">
+          <svg viewBox="0 0 340 340" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="170" cy="170" r="160" stroke="#7A8C6E" stroke-width="0.5" stroke-dasharray="4 6"/>
+            <circle cx="170" cy="170" r="112" stroke="#A3B594" stroke-width="0.5" opacity=".5"/>
+            <circle cx="170" cy="170" r="56" stroke="#7A8C6E" stroke-width="0.5" opacity=".4"/>
+            <line x1="170" y1="8" x2="170" y2="332" stroke="#7A8C6E" stroke-width="0.4" opacity=".25"/>
+            <line x1="8" y1="170" x2="332" y2="170" stroke="#7A8C6E" stroke-width="0.4" opacity=".25"/>
+            <line x1="56" y1="56" x2="284" y2="284" stroke="#7A8C6E" stroke-width="0.4" opacity=".25"/>
+            <line x1="284" y1="56" x2="56" y2="284" stroke="#7A8C6E" stroke-width="0.4" opacity=".25"/>
+            <path d="M170 170 L170 18 A152 152 0 0 1 277 93 Z" fill="#7A8C6E" opacity=".11"/>
+            <path d="M170 170 L277 93 A152 152 0 0 1 322 170 Z" fill="#A3B594" opacity=".09"/>
+            <path d="M170 170 L322 170 A152 152 0 0 1 277 247 Z" fill="#7A8C6E" opacity=".13"/>
+            <path d="M170 170 L277 247 A152 152 0 0 1 170 322 Z" fill="#4E6144" opacity=".09"/>
+            <path d="M170 170 L170 322 A152 152 0 0 1 63 247 Z" fill="#7A8C6E" opacity=".12"/>
+            <path d="M170 170 L63 247 A152 152 0 0 1 18 170 Z" fill="#A3B594" opacity=".08"/>
+            <path d="M170 170 L18 170 A152 152 0 0 1 63 93 Z" fill="#7A8C6E" opacity=".14"/>
+            <path d="M170 170 L63 93 A152 152 0 0 1 170 18 Z" fill="#4E6144" opacity=".1"/>
+            <text x="170" y="44" text-anchor="middle" font-family="Jost" font-size="9" fill="#4E6144" letter-spacing="1.5" font-weight="300">РАБОТА</text>
+            <text x="292" y="116" text-anchor="middle" font-family="Jost" font-size="9" fill="#4E6144" letter-spacing="1.5" font-weight="300">ФИНАНСЫ</text>
+            <text x="316" y="178" text-anchor="middle" font-family="Jost" font-size="9" fill="#4E6144" letter-spacing="1.5" font-weight="300">ЗДОРОВЬЕ</text>
+            <text x="280" y="250" text-anchor="middle" font-family="Jost" font-size="9" fill="#4E6144" letter-spacing="1.5" font-weight="300">СЕМЬЯ</text>
+            <text x="170" y="318" text-anchor="middle" font-family="Jost" font-size="9" fill="#4E6144" letter-spacing="1.5" font-weight="300">ОТНОШЕНИЯ</text>
+            <text x="57" y="250" text-anchor="middle" font-family="Jost" font-size="9" fill="#4E6144" letter-spacing="1.5" font-weight="300">РАЗВИТИЕ</text>
+            <text x="22" y="178" text-anchor="middle" font-family="Jost" font-size="9" fill="#4E6144" letter-spacing="1.5" font-weight="300">СРЕДА</text>
+            <text x="58" y="112" text-anchor="middle" font-family="Jost" font-size="9" fill="#4E6144" letter-spacing="1.5" font-weight="300">ОТДЫХ</text>
+            <circle cx="170" cy="170" r="5" fill="#7A8C6E" opacity=".5"/>
+          </svg>
+          <div class="wheel-center">
+            <div class="wheel-center-text">8 сфер<br>жизни</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════ SWITCHER ════ -->
+<section id="switcher">
+  <div class="switcher-intro container fade-up">
+    <div class="switcher-eyebrow">Три инструмента</div>
+    <h2 class="switcher-title">Выбери то, что нужно тебе сейчас</h2>
+    <p class="switcher-sub">Каждый продукт решает свою задачу. Можно использовать по отдельности — или все три вместе.</p>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs-wrap">
+    <button class="tab-btn active" data-tab="tracker">Архитектор Недели</button>
+    <button class="tab-btn" data-tab="route">Маршрут Архитектора</button>
+    <button class="tab-btn" data-tab="mentor">Инструменты наставника</button>
+  </div>
+
+  <!-- ══ PANEL 1: TRACKER ══ -->
+  <div class="tab-panel active" id="tab-tracker">
+
+    <!-- HERO блок продукта -->
+    <div style="background:var(--cream);">
+      <div class="container panel-hero">
+        <div class="panel-grid">
+          <div>
+            <div class="p-eyebrow fade-up">Ежедневная практика</div>
+            <h2 class="p-title fade-up d1">Архитектор<br><em>Недели</em></h2>
+            <p class="p-price-tag fade-up d1"><strong>349 ₽</strong> / месяц</p>
+            <p class="p-sub fade-up d2">30 дней структурированной работы с собой. Утренние установки, вечерняя рефлексия, аналитика недели и месяца — всё через Telegram-бот.</p>
+            <div class="fade-up d3">
+              <a href="https://t.me/Architect_Week_bot" class="btn btn-dark">Начать в Telegram</a>
+              <span class="btn-note">Доступ открывается сразу · Отмена в любой момент</span>
+            </div>
+          </div>
+          <div class="fade-up d2">
+            <div class="steps-timeline" style="border-top:1px solid var(--border);">
+              <div class="step-row" style="border-color:var(--border);color:var(--text);">
+                <div class="step-num-big" style="color:rgba(122,140,110,.35);">☀</div>
+                <div class="step-content">
+                  <h3 style="color:var(--text);">Утро</h3>
+                  <p style="color:var(--text-mid);">3 персональные установки на день. Не мотивационные цитаты — конкретный фокус, основанный на твоей жизни.</p>
+                </div>
+              </div>
+              <div class="step-row" style="border-color:var(--border);">
+                <div class="step-num-big" style="color:rgba(122,140,110,.35);">◑</div>
+                <div class="step-content">
+                  <h3 style="color:var(--text);">Вечер</h3>
+                  <p style="color:var(--text-mid);">3 вопроса для рефлексии. Помогают зафиксировать день и увидеть, что работает, а что нет.</p>
+                </div>
+              </div>
+              <div class="step-row" style="border-color:var(--border);">
+                <div class="step-num-big" style="color:rgba(122,140,110,.35);">◈</div>
+                <div class="step-content">
+                  <h3 style="color:var(--text);">Неделя</h3>
+                  <p style="color:var(--text-mid);">Аналитика по итогам 7 дней. Паттерны, которые ты не замечаешь сам — видны в динамике.</p>
+                </div>
+              </div>
+              <div class="step-row" style="border-color:transparent;">
+                <div class="step-num-big" style="color:rgba(122,140,110,.35);">✦</div>
+                <div class="step-content">
+                  <h3 style="color:var(--text);">Месяц</h3>
+                  <p style="color:var(--text-mid);">Итоговый разбор и рекомендации на следующий период. Всё на базе твоих реальных данных.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CTA band -->
+    <div class="cta-band fade-up">
+      <p class="cta-band-text">30 дней — это достаточно,<br>чтобы <em>увидеть себя иначе</em></p>
+      <a href="https://t.me/Architect_Week_bot" class="btn btn-dark">Начать — 349 ₽/мес</a>
+      <span class="btn-note" style="margin-top:10px;display:block;">Только через Telegram · Отмена в любой момент</span>
+    </div>
+
+    <!-- DARK: for whom -->
+    <div class="dark-section">
+      <div class="container">
+        <div class="panel-grid">
+          <div>
+            <div class="dark-eyebrow fade-up">Для кого</div>
+            <h2 class="dark-title fade-up">Если хочется хоть какой-то точки опоры</h2>
+            <p class="dark-text fade-up">Не нужно перестраивать всю жизнь. Архитектор Недели — это маленький ежедневный ритуал, который создаёт структуру там, где её нет. Подходит тем, кто устал от хаоса и хочет начать с малого.</p>
+          </div>
+          <div class="fade-up d1">
+            <div class="price-box">
+              <div class="price-big">349 ₽</div>
+              <div class="price-period">в месяц · подписка</div>
+              <ul class="price-list">
+                <li>3 утренние установки каждый день</li>
+                <li>3 вечерних вопроса для рефлексии</li>
+                <li>Еженедельная аналитика паттернов</li>
+                <li>Итоговый разбор месяца с рекомендациями</li>
+                <li>Всё в Telegram — без приложений</li>
+              </ul>
+              <a href="https://t.me/Architect_Week_bot" class="btn btn-cream btn-full">Начать в Telegram</a>
+              <div class="price-note btn-note btn-note-light">Следующий месяц — по желанию</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /tab-tracker -->
+
+  <!-- ══ PANEL 2: ROUTE ══ -->
+  <div class="tab-panel" id="tab-route">
+
+    <div style="background:var(--cream);">
+      <div class="container panel-hero">
+        <div class="panel-grid">
+          <div>
+            <div class="p-eyebrow fade-up">Работа над собой</div>
+            <h2 class="p-title fade-up d1">Маршрут<br><em>Архитектора</em></h2>
+            <p class="p-price-tag fade-up d1"><strong>990 ₽</strong> / месяц</p>
+            <p class="p-sub fade-up d2">Система глубокой работы с жизнью. 8 сфер, диагностика, конкретные инструменты по каждой — и AI-анализ именно твоей ситуации.</p>
+            <div class="fade-up d3">
+              <a href="https://t.me/Architect_Changes_bot" class="btn btn-dark">Получить доступ</a>
+              <span class="btn-note">Доступ через Telegram · Подписка · Отмена в любой момент</span>
+            </div>
+          </div>
+          <div class="fade-up d2">
+            <div class="sphere-grid">
+              <div class="sphere-item" style="background:rgba(122,140,110,.1);border-color:rgba(122,140,110,.2);">
+                <div class="sphere-dot"></div><div class="sphere-name" style="color:var(--text);">Работа</div>
+              </div>
+              <div class="sphere-item" style="background:rgba(122,140,110,.1);border-color:rgba(122,140,110,.2);">
+                <div class="sphere-dot"></div><div class="sphere-name" style="color:var(--text);">Финансы</div>
+              </div>
+              <div class="sphere-item" style="background:rgba(122,140,110,.1);border-color:rgba(122,140,110,.2);">
+                <div class="sphere-dot"></div><div class="sphere-name" style="color:var(--text);">Здоровье</div>
+              </div>
+              <div class="sphere-item" style="background:rgba(122,140,110,.1);border-color:rgba(122,140,110,.2);">
+                <div class="sphere-dot"></div><div class="sphere-name" style="color:var(--text);">Семья</div>
+              </div>
+              <div class="sphere-item" style="background:rgba(122,140,110,.1);border-color:rgba(122,140,110,.2);">
+                <div class="sphere-dot"></div><div class="sphere-name" style="color:var(--text);">Отношения</div>
+              </div>
+              <div class="sphere-item" style="background:rgba(122,140,110,.1);border-color:rgba(122,140,110,.2);">
+                <div class="sphere-dot"></div><div class="sphere-name" style="color:var(--text);">Развитие</div>
+              </div>
+              <div class="sphere-item" style="background:rgba(122,140,110,.1);border-color:rgba(122,140,110,.2);">
+                <div class="sphere-dot"></div><div class="sphere-name" style="color:var(--text);">Среда / быт</div>
+              </div>
+              <div class="sphere-item" style="background:rgba(122,140,110,.1);border-color:rgba(122,140,110,.2);">
+                <div class="sphere-dot"></div><div class="sphere-name" style="color:var(--text);">Отдых / хобби</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Contents -->
+    <div style="background:var(--warm-white);padding:100px 0;">
+      <div class="container">
+        <div class="panel-grid">
+          <div>
+            <div class="p-eyebrow fade-up" style="color:var(--stone-dark);">
+              <span style="width:32px;height:1px;background:var(--stone-dark);display:inline-block;vertical-align:middle;margin-right:12px;"></span>Состав
+            </div>
+            <h2 class="p-title fade-up" style="font-size:clamp(34px,3.5vw,48px);">Что ты получаешь</h2>
+          </div>
+          <ul class="features-list fade-up">
+            <li class="feature-item">
+              <div class="feature-dot">🗺</div>
+              <div>
+                <div class="feature-title">Аудит жизни целиком</div>
+                <div class="feature-text">Один документ — все 8 сфер. Оцениваешь текущее состояние, видишь где опора, а где теряется энергия.</div>
+              </div>
+            </li>
+            <li class="feature-item">
+              <div class="feature-dot">🔍</div>
+              <div>
+                <div class="feature-title">Глубокая работа по каждой сфере</div>
+                <div class="feature-text">8 отдельных инструментов. Ценности, ограничивающие убеждения, конкретные шаги — по каждой теме отдельно.</div>
+              </div>
+            </li>
+            <li class="feature-item">
+              <div class="feature-dot">✦</div>
+              <div>
+                <div class="feature-title">AI-анализ твоих данных</div>
+                <div class="feature-text">Заполняешь — получаешь разбор именно твоей ситуации. Без шаблонов и мотивационной воды.</div>
+              </div>
+            </li>
+            <li class="feature-item">
+              <div class="feature-dot">📍</div>
+              <div>
+                <div class="feature-title">Фокус и план действий</div>
+                <div class="feature-text">На основе аудита система помогает определить, с чего начать — не с советов, а с твоих собственных данных.</div>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- CTA band -->
+    <div class="cta-band fade-up">
+      <p class="cta-band-text">Твоя жизнь уже есть.<br><em>Осталось её увидеть целиком.</em></p>
+      <a href="https://t.me/Architect_Changes_bot" class="btn btn-dark">Начать — 990 ₽/мес</a>
+    </div>
+
+    <!-- DARK: not coaching -->
+    <div class="dark-section">
+      <div class="container">
+        <div class="panel-grid">
+          <div>
+            <div class="dark-eyebrow fade-up">Честно</div>
+            <h2 class="dark-title fade-up">Мы не обещаем трансформацию за 21 день</h2>
+            <p class="dark-text fade-up" style="margin-bottom:48px;">Нет харизматичного эксперта с программой. Нет марафонов и домашних заданий. Есть структура, вопросы и твои собственные ответы. Ты сам себе архитектор.</p>
+            <a href="https://t.me/Architect_Changes_bot" class="btn btn-outline-light fade-up">Начать работу — 990 ₽/мес</a>
+          </div>
+          <div class="fade-up d1">
+            <table class="contrast-table" style="border-color:rgba(245,240,232,.12);">
+              <thead>
+                <tr>
+                  <th style="border-color:rgba(245,240,232,.15);">Не это</th>
+                  <th style="border-color:rgba(245,240,232,.15);color:var(--sage-light);">А это</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="border-color:rgba(245,240,232,.1);color:rgba(245,240,232,.35);">Мотивация и вдохновение</td>
+                  <td style="border-color:rgba(245,240,232,.1);color:rgba(245,240,232,.8);">Структура и наблюдение</td>
+                </tr>
+                <tr>
+                  <td style="border-color:rgba(245,240,232,.1);color:rgba(245,240,232,.35);">Чужие истории успеха</td>
+                  <td style="border-color:rgba(245,240,232,.1);color:rgba(245,240,232,.8);">Твои собственные данные</td>
+                </tr>
+                <tr>
+                  <td style="border-color:rgba(245,240,232,.1);color:rgba(245,240,232,.35);">Курс с жёсткой программой</td>
+                  <td style="border-color:rgba(245,240,232,.1);color:rgba(245,240,232,.8);">Инструмент в твоём темпе</td>
+                </tr>
+                <tr>
+                  <td style="border-color:transparent;color:rgba(245,240,232,.35);">Обещания быстрых результатов</td>
+                  <td style="border-color:transparent;color:rgba(245,240,232,.8);">Честная карта твоей жизни</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /tab-route -->
+
+  <!-- ══ PANEL 3: MENTOR ══ -->
+  <div class="tab-panel" id="tab-mentor">
+
+    <div style="background:var(--cream);">
+      <div class="container panel-hero">
+        <div class="panel-grid">
+          <div>
+            <div class="p-eyebrow fade-up">Для наставников</div>
+            <h2 class="p-title fade-up d1">Инструменты<br><em>наставника</em></h2>
+            <p class="p-price-tag fade-up d1"><strong>1 490 ₽</strong> · разовая покупка</p>
+            <p class="p-sub fade-up d2">Комплект для коучей, психологов и наставников. Всё, чтобы структурно войти в ситуацию клиента, понять его боль и выстроить работу.</p>
+            <div class="fade-up d3">
+              <a href="https://t.me/Architect_Changes_bot" class="btn btn-dark">Получить комплект</a>
+              <span class="btn-note">Разовая оплата · Файлы + инструкции внутри</span>
+            </div>
+          </div>
+          <div class="fade-up d2">
+            <div class="panel-grid-3" style="grid-template-columns:1fr 1fr;gap:2px;">
+              <div class="panel-card" style="background:var(--warm-white);">
+                <div class="panel-card-icon">📋</div>
+                <h3>Диагностика клиента</h3>
+                <p>Структурный аудит ситуации человека перед началом работы.</p>
+              </div>
+              <div class="panel-card" style="background:var(--warm-white);">
+                <div class="panel-card-icon">🗺</div>
+                <h3>Карта запроса</h3>
+                <p>Инструмент для точного понимания того, с чем реально пришёл клиент.</p>
+              </div>
+              <div class="panel-card" style="background:var(--warm-white);">
+                <div class="panel-card-icon">👤</div>
+                <h3>Карта клиента</h3>
+                <p>Профиль человека — ценности, паттерны, ограничения, ресурсы.</p>
+              </div>
+              <div class="panel-card" style="background:var(--warm-white);">
+                <div class="panel-card-icon">📅</div>
+                <h3>Планнер сессии</h3>
+                <p>Структура каждой встречи: цель, ключевые вопросы, итоги.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Who it's for -->
+    <div style="background:var(--warm-white);padding:100px 0;">
+      <div class="container">
+        <div style="text-align:center;margin-bottom:56px;">
+          <div style="font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--stone-dark);margin-bottom:16px;display:flex;align-items:center;justify-content:center;gap:12px;">
+            <span style="width:32px;height:1px;background:var(--stone-dark);display:inline-block;"></span>
+            Для кого
+            <span style="width:32px;height:1px;background:var(--stone-dark);display:inline-block;"></span>
+          </div>
+          <h2 class="p-title fade-up" style="font-size:clamp(34px,3.5vw,48px);margin-bottom:0;">Если ты работаешь с людьми</h2>
+        </div>
+        <div class="panel-grid-3">
+          <div class="panel-card fade-up">
+            <div class="panel-card-num">01</div>
+            <h3>Коуч</h3>
+            <p>Хочешь давать клиентам не просто разговор, а структурированный инструмент. Комплект становится частью твоей методологии.</p>
+          </div>
+          <div class="panel-card fade-up d1">
+            <div class="panel-card-num">02</div>
+            <h3>Психолог / терапевт</h3>
+            <p>Нужен инструмент для первичной диагностики и структуры между сессиями. Карта клиента помогает видеть картину целиком.</p>
+          </div>
+          <div class="panel-card fade-up d2">
+            <div class="panel-card-num">03</div>
+            <h3>Наставник / ментор</h3>
+            <p>Ведёшь людей к цели и хочешь делать это системно. Планнер сессии и карта запроса дают структуру каждой встрече.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CTA band -->
+    <div class="cta-band fade-up">
+      <p class="cta-band-text">Один раз — и у тебя есть<br><em>система работы с людьми</em></p>
+      <a href="https://t.me/Architect_Changes_bot" class="btn btn-dark">Получить комплект — 1 490 ₽</a>
+      <span class="btn-note" style="margin-top:10px;display:block;">Разовая покупка · Без подписки</span>
+    </div>
+
+    <!-- DARK -->
+    <div class="dark-section">
+      <div class="container">
+        <div class="panel-grid">
+          <div>
+            <div class="dark-eyebrow fade-up">Что внутри</div>
+            <h2 class="dark-title fade-up">5 документов с инструкциями</h2>
+            <p class="dark-text fade-up" style="margin-bottom:44px;">Каждый файл — это не просто таблица. Внутри встроены инструкции по применению и AI-промты для глубокого анализа ситуации клиента. Используешь сам или отдаёшь клиенту для самостоятельной работы между сессиями.</p>
+            <a href="https://t.me/Architect_Changes_bot" class="btn btn-outline-light fade-up">Получить комплект — 1 490 ₽</a>
+          </div>
+          <div class="fade-up d1">
+            <div class="price-box">
+              <div class="price-big">1 490 ₽</div>
+              <div class="price-period">разовая покупка · навсегда</div>
+              <ul class="price-list">
+                <li>Диагностика клиента</li>
+                <li>Карта запроса</li>
+                <li>Карта клиента</li>
+                <li>Планнер сессии</li>
+                <li>Дневник рефлексии для клиента</li>
+                <li>Инструкции и AI-промты внутри</li>
+              </ul>
+              <a href="https://t.me/Architect_Changes_bot" class="btn btn-cream btn-full">Получить комплект</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /tab-mentor -->
+
+</section>
+
+<!-- ════ FAQ (общий) ════ -->
+<div class="faq-section" id="faq">
+  <div class="container">
+    <div class="faq-inner">
+      <div>
+        <div class="faq-eyebrow fade-up">Вопросы</div>
+        <h2 class="faq-sticky-title fade-up">Часто<br>спрашивают</h2>
+      </div>
+      <div class="faq-list">
+        <div class="faq-item">
+          <button class="faq-q">
+            Что я получу?
+            <svg class="faq-icon" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="9" y1="2" x2="9" y2="16"/><line x1="2" y1="9" x2="16" y2="9"/></svg>
+          </button>
+          <div class="faq-a">
+            <strong style="display:block;margin-bottom:10px;font-weight:500;color:var(--text);">Архитектор Недели — 349 ₽/мес</strong>
+            Ежедневная практика через Telegram-бот:<br>
+            · 3 утренние установки на день<br>
+            · 3 вечерних вопроса для рефлексии<br>
+            · Аналитика недели и итоговый разбор месяца<br>
+            <br>
+            <strong style="display:block;margin-bottom:10px;font-weight:500;color:var(--text);">Маршрут Архитектора — 990 ₽/мес</strong>
+            Система глубокой работы с жизнью:<br>
+            · Аудит жизни по 8 сферам<br>
+            · Инструменты по каждой сфере отдельно<br>
+            · AI-анализ именно твоей ситуации<br>
+            · Фокус и конкретные шаги<br>
+            <br>
+            <strong style="display:block;margin-bottom:10px;font-weight:500;color:var(--text);">Инструменты наставника — 1 490 ₽ (разово)</strong>
+            Комплект для профессиональной работы с людьми:<br>
+            · Диагностика клиента и карта запроса<br>
+            · Карта клиента и планнер сессии<br>
+            · Дневник рефлексии для клиента<br>
+            · Инструкции и AI-промты внутри каждого файла
+          </div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q">
+            Чем отличаются три продукта?
+            <svg class="faq-icon" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="9" y1="2" x2="9" y2="16"/><line x1="2" y1="9" x2="16" y2="9"/></svg>
+          </button>
+          <div class="faq-a">Архитектор Недели — это ежедневная практика через бот: утро и вечер. Маршрут — это глубокая работа с жизнью как системой, 8 сфер и AI-анализ. Инструменты наставника — для тех, кто профессионально работает с людьми. Можно купить один продукт или все три.</div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q">
+            Нужно ли уметь работать с таблицами?
+            <svg class="faq-icon" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="9" y1="2" x2="9" y2="16"/><line x1="2" y1="9" x2="16" y2="9"/></svg>
+          </button>
+          <div class="faq-a">Архитектор Недели работает полностью через Telegram — никаких таблиц. Маршрут и Инструменты наставника — это файлы с простой структурой и встроенными инструкциями. Специальных навыков не нужно.</div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q">
+            Это заменит коуча или терапевта?
+            <svg class="faq-icon" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="9" y1="2" x2="9" y2="16"/><line x1="2" y1="9" x2="16" y2="9"/></svg>
+          </button>
+          <div class="faq-a">Нет. Это инструменты структуры — они дополняют живую работу, а не заменяют её. Многие специалисты используют их именно так: клиент работает самостоятельно между сессиями.</div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q">
+            Как отменить подписку?
+            <svg class="faq-icon" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="9" y1="2" x2="9" y2="16"/><line x1="2" y1="9" x2="16" y2="9"/></svg>
+          </button>
+          <div class="faq-a">Через Telegram-бот — в любой момент, без звонков и объяснений. Всё что заполнил, остаётся у тебя.</div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q">
+            Инструменты наставника — это разовая покупка?
+            <svg class="faq-icon" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="9" y1="2" x2="9" y2="16"/><line x1="2" y1="9" x2="16" y2="9"/></svg>
+          </button>
+          <div class="faq-a">Да. 1 490 ₽ один раз — и файлы остаются у тебя навсегда. Никакой подписки.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════ FINAL CTA ════ -->
+<section id="final">
+  <div class="container">
+    <div class="final-eyebrow fade-up">Начать</div>
+    <h2 class="final-title fade-up">Твоя жизнь уже есть.<br><em>Осталось её увидеть.</em></h2>
+    <p class="final-sub fade-up">Выбери инструмент, который нужен тебе сейчас. Можно начать с малого — и двигаться дальше в своём темпе.</p>
+    <div class="fade-up" style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;">
+      <a href="https://t.me/Architect_Week_bot" class="btn btn-dark">Архитектор Недели — 349 ₽/мес</a>
+      <a href="https://t.me/Architect_Changes_bot" class="btn btn-outline">Маршрут — 990 ₽/мес</a>
+      <a href="https://t.me/Architect_Changes_bot" class="btn btn-outline">Наставнику — 1 490 ₽</a>
+    </div>
+    <span class="btn-note fade-up" style="margin-top:20px;display:block;text-align:center;">Все продукты доступны через Telegram-бот</span>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">Архитектор Изменений · система осознанной жизни</div>
+  <div class="footer-note">© 2025 · Все права защищены</div>
+</footer>
+
+<script>
+// Tabs
+const tabBtns = document.querySelectorAll('.tab-btn');
+const tabPanels = document.querySelectorAll('.tab-panel');
+
+tabBtns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    const target = btn.dataset.tab;
+    tabBtns.forEach(b => b.classList.remove('active'));
+    tabPanels.forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-' + target).classList.add('active');
+    // scroll to tabs
+    document.querySelector('.tabs-wrap').scrollIntoView({behavior:'smooth', block:'start'});
+    // re-trigger animations in new panel
+    setTimeout(() => {
+      document.querySelectorAll('#tab-' + target + ' .fade-up').forEach(el => {
+        if(!el.classList.contains('visible')) {
+          observer.observe(el);
+        }
+      });
+    }, 100);
+  });
+});
+
+// Fade-up
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if(e.isIntersecting) e.target.classList.add('visible');
+  });
+}, {threshold:.1, rootMargin:'0px 0px -50px 0px'});
+
+document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+
+// FAQ
+document.querySelectorAll('.faq-q').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const item = btn.closest('.faq-item');
+    const isOpen = item.classList.contains('open');
+    document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+    if(!isOpen) item.classList.add('open');
+  });
+});
+</script>
+</body>
+</html>
